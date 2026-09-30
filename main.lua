@@ -216,66 +216,104 @@ end
 TPBrewog.MouseButton1Click:Connect(TeleportBrewog)
 
 --==================================================
--- AUTO FARM
+-- AUTO FARM BREWOG
 --==================================================
 
-local function ActivatePrompt()
+_G.DanzzyAutoFarm = false
 
-    local Target = FindBrewog()
+local function GetBrewogPart()
+    local Target = workspace:FindFirstChild("Brewog", true)
 
     if not Target then
-        return false
+        return nil
     end
 
-    local Prompt = Target:FindFirstChildWhichIsA(
-        "ProximityPrompt",
-        true
-    )
-
-    if Prompt then
-
-        pcall(function()
-            fireproximityprompt(Prompt)
-        end)
-
-        return true
+    if Target:IsA("BasePart") then
+        return Target
     end
 
-    return false
+    if Target:IsA("Model") then
+        return Target.PrimaryPart
+            or Target:FindFirstChildWhichIsA("BasePart", true)
+    end
+
+    return nil
 end
 
-local function AutoFarmLoop()
+local function StartAutoFarm()
 
     task.spawn(function()
 
         while _G.DanzzyAutoFarm do
 
-            local Target = FindBrewog()
+            local Character = Player.Character
 
-            if not Target then
-
-                Status.Text = "● MENCARI BREWOG..."
-
-                task.wait(2)
-
+            if not Character then
+                task.wait(1)
                 continue
             end
 
+            local Root =
+                Character:FindFirstChild("HumanoidRootPart")
+
+            local Target = GetBrewogPart()
+
+            if not Root then
+                task.wait(1)
+                continue
+            end
+
+            if not Target then
+                Status.Text = "● MENCARI BREWOG..."
+                task.wait(2)
+                continue
+            end
+
+            -- menuju titik Brewog
             Status.Text = "● MENUJU BREWOG..."
 
-            TeleportBrewog()
+            Root.CFrame =
+                Target.CFrame + Vector3.new(0,3,0)
 
-            task.wait(1)
+            task.wait(2)
 
             if not _G.DanzzyAutoFarm then
                 break
             end
 
-            Status.Text = "● FARM BREWOG..."
+            -- tetap di area Brewog
+            Status.Text = "● AUTO FARM BREWOG : ON"
 
-            ActivatePrompt()
+            for i = 1,10 do
 
-            task.wait(1)
+                if not _G.DanzzyAutoFarm then
+                    break
+                end
+
+                local CurrentRoot =
+                    Player.Character
+                    and Player.Character:FindFirstChild(
+                        "HumanoidRootPart"
+                    )
+
+                if CurrentRoot then
+
+                    local Distance =
+                        (CurrentRoot.Position -
+                        Target.Position).Magnitude
+
+                    -- kalau keluar area, kembali
+                    if Distance > 10 then
+                        CurrentRoot.CFrame =
+                            Target.CFrame +
+                            Vector3.new(0,3,0)
+                    end
+
+                end
+
+                task.wait(1)
+
+            end
 
         end
 
@@ -287,7 +325,8 @@ end
 
 AutoFarm.MouseButton1Click:Connect(function()
 
-    _G.DanzzyAutoFarm = not _G.DanzzyAutoFarm
+    _G.DanzzyAutoFarm =
+        not _G.DanzzyAutoFarm
 
     if _G.DanzzyAutoFarm then
 
@@ -295,9 +334,10 @@ AutoFarm.MouseButton1Click:Connect(function()
         AutoFarm.BackgroundColor3 =
             Color3.fromRGB(35,150,75)
 
-        Status.Text = "● AUTO FARM BREWOG : ON"
+        Status.Text =
+            "● AUTO FARM BREWOG : ON"
 
-        AutoFarmLoop()
+        StartAutoFarm()
 
     else
 
@@ -305,7 +345,8 @@ AutoFarm.MouseButton1Click:Connect(function()
         AutoFarm.BackgroundColor3 =
             Color3.fromRGB(43,47,60)
 
-        Status.Text = "● AUTO FARM : OFF"
+        Status.Text =
+            "● AUTO FARM : OFF"
 
     end
 
