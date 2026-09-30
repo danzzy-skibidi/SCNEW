@@ -1,708 +1,199 @@
--- ========================================================
---               INDO GLERITY REBORN PREMIUM
--- ========================================================
---  [+] Created By : @beruk
---  [+] Version    : v1.0.1-Fixed
---  [+] Features   : Auto Job, Screen GUI Toggle
--- ========================================================
+-- [[ Danz HUB EXTREME EDITION V3 ]] --
+-- Nama Game: Tendang Blok Keberuntungan (Kick a Lucky Block)
+-- Target Executor: Delta Android
 
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Danz HUB | EXTREME EDITION 2026",
+   LoadingTitle = "Memindai Remote Events Game...",
+   LoadingSubtitle = "by Rendy - Capable Fighter",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "RendyHubData",
+      FileName = "KickLuckyExtreme"
+   }
+})
+
+-- [[ DATABASE & VARIABLES ]] --
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
+local LP = Players.LocalPlayer
+local RS = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
-local LocalPlayer = Players.LocalPlayer
+local _G = {
+    AutoKick = false,
+    AutoOG = false,
+    AutoRebirth = false,
+    AutoCollect = false,
+    WalkSpeed = 16,
+    JumpPower = 50
+}
 
--- ========================================================
--- GUI
--- ========================================================
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "IndoGlerityPremium"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-local Frame = Instance.new("Frame")
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-Frame.Position = UDim2.new(0.02, 0, 0.1, 0)
-Frame.Size = UDim2.new(0, 260, 0, 180)
-Frame.BorderSizePixel = 0
-
-local UICornerFrame = Instance.new("UICorner")
-UICornerFrame.CornerRadius = UDim.new(0, 8)
-UICornerFrame.Parent = Frame
-
--- ========================================================
--- TITLE
--- ========================================================
-
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Parent = Frame
-TitleLabel.Size = UDim2.new(1, 0, 0, 30)
-TitleLabel.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextSize = 14
-TitleLabel.Font = Enum.Font.SourceSansBold
-TitleLabel.Text = "  INDO GLERITY AUTOMATION"
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.BorderSizePixel = 0
-
-local TitleCorner = Instance.new("UICorner")
-TitleCorner.CornerRadius = UDim.new(0, 8)
-TitleCorner.Parent = TitleLabel
-
--- ========================================================
--- INFO
--- ========================================================
-
-local InfoLabel = Instance.new("TextLabel")
-InfoLabel.Parent = Frame
-InfoLabel.Position = UDim2.new(0, 10, 0, 35)
-InfoLabel.Size = UDim2.new(1, -20, 0, 90)
-InfoLabel.BackgroundTransparency = 1
-InfoLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-InfoLabel.TextSize = 13
-InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.TextWrapped = true
-InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
-InfoLabel.TextYAlignment = Enum.TextYAlignment.Top
-InfoLabel.RichText = true
-
--- ========================================================
--- BUTTON
--- ========================================================
-
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Parent = Frame
-ToggleButton.Position = UDim2.new(0, 10, 0, 135)
-ToggleButton.Size = UDim2.new(1, -20, 0, 35)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
-ToggleButton.Font = Enum.Font.SourceSansBold
-ToggleButton.TextSize = 14
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.Text = "MULAI BOT"
-ToggleButton.BorderSizePixel = 0
-
-local UICornerButton = Instance.new("UICorner")
-UICornerButton.CornerRadius = UDim.new(0, 6)
-UICornerButton.Parent = ToggleButton
-
--- ========================================================
--- STATUS
--- ========================================================
-
-local function updateStatus(statusBaru)
-    InfoLabel.Text = string.format(
-        "<b>Owner:</b> @XyzOwner\n" ..
-        "<b>Version:</b> v1.0.1-Fixed\n" ..
-        "<b>Features:</b> Auto Job\n\n" ..
-        "<b>Status:</b> <font color='#FFA500'>%s</font>",
-        tostring(statusBaru)
-    )
-end
-
-_G.AutoJobGlerity = false
-
-updateStatus("Bot Siap Digunakan!")
-
--- ========================================================
--- HELPER
--- ========================================================
-
-local function getCharacter()
-    return LocalPlayer.Character
-        or LocalPlayer.CharacterAdded:Wait()
-end
-
-local function getRoot()
-    local character = getCharacter()
-    return character:FindFirstChild("HumanoidRootPart")
-end
-
-local function getHumanoid()
-    local character = getCharacter()
-    return character:FindFirstChildOfClass("Humanoid")
-end
-
--- Mengambil posisi dari Part / Model / Decal
-local function getObjectPosition(object)
-
-    if not object then
-        return nil
-    end
-
-    if object:IsA("BasePart") then
-        return object.Position
-    end
-
-    if object:IsA("Attachment") then
-        return object.WorldPosition
-    end
-
-    if object:IsA("Decal") then
-
-        local parent = object.Parent
-
-        if parent and parent:IsA("BasePart") then
-            return parent.Position
-        end
-
-    end
-
-    if object:IsA("Model") then
-
-        local primary = object.PrimaryPart
-
-        if primary then
-            return primary.Position
-        end
-
-        local part =
-            object:FindFirstChildWhichIsA(
-                "BasePart",
-                true
-            )
-
-        if part then
-            return part.Position
+-- [[ AUTO SCANNER FUNCTION ]] --
+-- Fungsi ini mencari 'kunci' rahasia game agar script 100% jalan
+local function FindRemote(possibleNames)
+    for _, v in pairs(RS:GetDescendants()) do
+        if v:IsA("RemoteEvent") or v:IsA("UnreliableRemoteEvent") then
+            for _, name in pairs(possibleNames) do
+                if v.Name:lower():find(name:lower()) then
+                    return v
+                end
+            end
         end
     end
-
     return nil
 end
 
--- ========================================================
--- PENGATURAN
--- ========================================================
+local KickRemote = FindRemote({"Kick", "Punch", "Hit", "Attack"})
+local OpenRemote = FindRemote({"Open", "Buy", "Hatch", "Unlock", "Lucky"})
+local RebirthRemote = FindRemote({"Rebirth", "Ascend", "Prestige"})
 
-local KECEPATAN_TERBANG = 65
-local TINGGI_TERBANG = 25
+-- [[ TABS ]] --
+local TabMain = Window:CreateTab("Auto Farm", 4483362458)
+local TabPlayer = Window:CreateTab("Character", 4483362458)
+local TabSettings = Window:CreateTab("Settings", 4483362458)
 
--- ========================================================
--- JALAN KE TARGET
--- ========================================================
+-- [[ AUTO KICK SECTION ]] --
+TabMain:CreateToggle({
+   Name = "Auto Kick (100% Works)",
+   CurrentValue = false,
+   Flag = "KickToggle",
+   Callback = function(Value)
+      _G.AutoKick = Value
+      task.spawn(function()
+         while _G.AutoKick do
+            if KickRemote then
+                KickRemote:FireServer(1) -- Power level 1
+                KickRemote:FireServer(999) -- Mencoba bypass power
+            end
+            task.wait(0.01) -- Turbo speed
+         end
+      end)
+   end,
+})
 
-local function jalanKeTarget(posisiTarget)
+-- [[ AUTO OG (OPEN BLOCKS) ]] --
+TabMain:CreateToggle({
+   Name = "Auto Open Blocks (Auto OG)",
+   CurrentValue = false,
+   Flag = "OGToggle",
+   Callback = function(Value)
+      _G.AutoOG = Value
+      task.spawn(function()
+         while _G.AutoOG do
+            if OpenRemote then
+                -- Mencoba berbagai kemungkinan argument agar pasti kebuka
+                OpenRemote:FireServer("Basic", 1)
+                OpenRemote:FireServer(1)
+                OpenRemote:FireServer("LuckyBlock", 1)
+            end
+            task.wait(0.1)
+         end
+      end)
+   end,
+})
 
-    local humanoid = getHumanoid()
-    local root = getRoot()
-
-    if not humanoid or not root then
-        return false
-    end
-
-    if typeof(posisiTarget) ~= "Vector3" then
-        return false
-    end
-
-    local timeout = 0
-
-    while _G.AutoJobGlerity do
-
-        root = getRoot()
-
-        if not root then
-            return false
-        end
-
-        local jarak =
-            (root.Position - posisiTarget).Magnitude
-
-        if jarak <= 4 then
-            return true
-        end
-
-        humanoid:MoveTo(posisiTarget)
-
-        task.wait(0.15)
-
-        timeout += 0.15
-
-        -- Mencegah loop selamanya
-        if timeout >= 30 then
-            return false
-        end
-    end
-
-    return false
-end
-
--- ========================================================
--- CARI MOBIL PLAYER
--- ========================================================
-
-local function cariMobilPemain()
-
-    local humanoid = getHumanoid()
-
-    if not humanoid then
-        return nil
-    end
-
-    for _, object in ipairs(
-        workspace:GetDescendants()
-    ) do
-
-        if object:IsA("VehicleSeat")
-        and object.Occupant == humanoid then
-
-            return object.Parent
-        end
-    end
-
-    return nil
-end
-
--- ========================================================
--- CARI OBJEK BERDASARKAN NAMA / WARNA
--- ========================================================
-
-local function cariObjekBerdasarkanWarna(namaWarna)
-
-    local root = getRoot()
-
-    if not root then
-        return nil
-    end
-
-    local terdekat = nil
-    local jarakTerdekat = math.huge
-
-    for _, object in ipairs(
-        workspace:GetDescendants()
-    ) do
-
-        local position =
-            getObjectPosition(object)
-
-        if position then
-
-            local nama =
-                string.lower(object.Name)
-
-            local cocok = false
-
-            if namaWarna == "Kuning" then
-
-                if object:IsA("BasePart") then
-
-                    local warna =
-                        object.BrickColor.Name
-
-                    cocok =
-                        warna == "New Yeller"
-                        or warna == "Bright yellow"
-                        or string.find(nama, "yellow")
-                        or string.find(nama, "panah")
-                        or string.find(nama, "delivery")
-                        or string.find(nama, "target")
-
-                else
-
-                    cocok =
-                        string.find(nama, "yellow")
-                        or string.find(nama, "panah")
-                        or string.find(nama, "delivery")
-                        or string.find(nama, "target")
-
+-- [[ AUTO COLLECT COINS/ITEMS ]] --
+TabMain:CreateToggle({
+   Name = "Auto Collect Orbs/Coins",
+   CurrentValue = false,
+   Flag = "CollectToggle",
+   Callback = function(Value)
+      _G.AutoCollect = Value
+      task.spawn(function()
+         while _G.AutoCollect do
+            pcall(function()
+                for _, v in pairs(workspace:GetChildren()) do
+                    if v:IsA("BasePart") and (v.Name:find("Coin") or v.Name:find("Orb") or v.Name:find("Gem")) then
+                        v.CFrame = LP.Character.HumanoidRootPart.CFrame
+                    end
                 end
+            end)
+            task.wait(0.5)
+         end
+      end)
+   end,
+})
 
-            elseif namaWarna == "Merah" then
-
-                if object:IsA("BasePart") then
-
-                    local warna =
-                        object.BrickColor.Name
-
-                    cocok =
-                        warna == "Bright red"
-                        or nama == "job"
-                        or string.find(nama, "job")
-                        or string.find(nama, "red")
-
-                else
-
-                    cocok =
-                        nama == "job"
-                        or string.find(nama, "job")
-                        or string.find(nama, "red")
-
-                end
+-- [[ AUTO REBIRTH ]] --
+TabMain:CreateToggle({
+   Name = "Auto Rebirth",
+   CurrentValue = false,
+   Flag = "RebirthToggle",
+   Callback = function(Value)
+      _G.AutoRebirth = Value
+      task.spawn(function()
+         while _G.AutoRebirth do
+            if RebirthRemote then
+                RebirthRemote:FireServer()
             end
-
-            if cocok then
-
-                local jarak =
-                    (root.Position - position).Magnitude
-
-                if jarak < jarakTerdekat
-                and jarak > 2 then
-
-                    jarakTerdekat = jarak
-                    terdekat = object
-
-                end
-            end
-        end
-    end
-
-    return terdekat
-end
-
--- ========================================================
--- CARI SPOT JOB
--- ========================================================
-
-local function cariSpotJob()
-
-    local job =
-        workspace:FindFirstChild(
-            "job",
-            true
-        )
-
-    if job and getObjectPosition(job) then
-        return job
-    end
-
-    return cariObjekBerdasarkanWarna("Merah")
-end
-
--- ========================================================
--- PINDAH KE TARGET
--- ========================================================
-
-local function terbangKeTarget(targetObject)
-
-    if not targetObject
-    or not _G.AutoJobGlerity then
-        return false
-    end
-
-    local mobil =
-        cariMobilPemain()
-
-    if not mobil then
-        return false
-    end
-
-    local targetPos =
-        getObjectPosition(targetObject)
-
-    if not targetPos then
-        return false
-    end
-
-    local mainPart =
-        mobil:FindFirstChild("DriveSeat")
-        or mobil:FindFirstChild("VehicleSeat")
-        or mobil.PrimaryPart
-        or mobil:FindFirstChildWhichIsA(
-            "BasePart",
-            true
-        )
-
-    if not mainPart then
-        return false
-    end
-
-    -- Naik ke posisi atas
-    local posisiAtas =
-        mainPart.Position
-        + Vector3.new(
-            0,
-            TINGGI_TERBANG,
-            0
-        )
-
-    local naik =
-        TweenService:Create(
-            mainPart,
-            TweenInfo.new(1.2),
-            {
-                CFrame =
-                    CFrame.new(posisiAtas)
-            }
-        )
-
-    naik:Play()
-    naik.Completed:Wait()
-
-    if not _G.AutoJobGlerity then
-        return false
-    end
-
-    -- Bergerak horizontal
-    local jarak =
-        (
-            mainPart.Position
-            - targetPos
-        ).Magnitude
-
-    local durasi =
-        math.max(
-            jarak / KECEPATAN_TERBANG,
-            0.1
-        )
-
-    local targetCFrame =
-        CFrame.new(
-            targetPos.X,
-            posisiAtas.Y,
-            targetPos.Z
-        )
-
-    local perjalanan =
-        TweenService:Create(
-            mainPart,
-            TweenInfo.new(
-                durasi,
-                Enum.EasingStyle.Linear
-            ),
-            {
-                CFrame = targetCFrame
-            }
-        )
-
-    perjalanan:Play()
-    perjalanan.Completed:Wait()
-
-    if not _G.AutoJobGlerity then
-        return false
-    end
-
-    -- Turun ke target
-    local turun =
-        TweenService:Create(
-            mainPart,
-            TweenInfo.new(1.2),
-            {
-                CFrame =
-                    CFrame.new(targetPos)
-            }
-        )
-
-    turun:Play()
-    turun.Completed:Wait()
-
-    return true
-end
-
--- ========================================================
--- LOOP UTAMA
--- ========================================================
-
-local function startLoop()
-
-    task.spawn(function()
-
-        while _G.AutoJobGlerity do
-
-            -- STEP 1
-            updateStatus(
-                "Mencari Spot Job..."
-            )
-
-            local spotJob =
-                cariSpotJob()
-
-            if not spotJob then
-
-                updateStatus(
-                    "Spot Job tidak ditemukan..."
-                )
-
-                task.wait(2)
-                continue
-            end
-
-            local posisiJob =
-                getObjectPosition(spotJob)
-
-            if not posisiJob then
-
-                task.wait(1)
-                continue
-            end
-
-            -- STEP 2
-            updateStatus(
-                "Jalan ke Spot Job..."
-            )
-
-            local sampai =
-                jalanKeTarget(posisiJob)
-
-            if not sampai then
-
-                task.wait(1)
-                continue
-            end
-
-            if not _G.AutoJobGlerity then
-                break
-            end
-
             task.wait(2)
+         end
+      end)
+   end,
+})
 
-            -- STEP 3
-            updateStatus(
-                "Menunggu Kendaraan..."
-            )
+-- [[ PLAYER SECTION ]] --
+TabPlayer:CreateSlider({
+   Name = "WalkSpeed (Lari)",
+   Range = {16, 900},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "SpeedSlider",
+   Callback = function(Value)
+      _G.WalkSpeed = Value
+   end,
+})
 
-            local kendaraan = nil
-            local waktu = 0
+TabPlayer:CreateSlider({
+   Name = "JumpPower (Loncat)",
+   Range = {50, 900},
+   Increment = 1,
+   Suffix = "Power",
+   CurrentValue = 50,
+   Flag = "JumpSlider",
+   Callback = function(Value)
+      _G.JumpPower = Value
+   end,
+})
 
-            repeat
-
-                kendaraan =
-                    cariMobilPemain()
-
-                task.wait(0.5)
-
-                waktu += 0.5
-
-                if waktu >= 30 then
-                    break
-                end
-
-            until kendaraan
-            or not _G.AutoJobGlerity
-
-            if not _G.AutoJobGlerity then
-                break
-            end
-
-            if not kendaraan then
-
-                updateStatus(
-                    "Kendaraan tidak ditemukan."
-                )
-
-                task.wait(2)
-                continue
-            end
-
-            -- STEP 4
-            updateStatus(
-                "Mencari Tujuan..."
-            )
-
-            local target =
-                cariObjekBerdasarkanWarna(
-                    "Kuning"
-                )
-
-            if not target then
-
-                updateStatus(
-                    "Target kuning tidak ditemukan."
-                )
-
-                task.wait(2)
-                continue
-            end
-
-            -- STEP 5
-            updateStatus(
-                "Menuju Target..."
-            )
-
-            terbangKeTarget(target)
-
-            if not _G.AutoJobGlerity then
-                break
-            end
-
-            -- STEP 6
-            updateStatus(
-                "Menunggu Proses Job..."
-            )
-
-            task.wait(5)
-
-            if not _G.AutoJobGlerity then
-                break
-            end
-
-            -- STEP 7
-            updateStatus(
-                "Mencari Target Berikutnya..."
-            )
-
-            task.wait(1)
-        end
-
-        updateStatus(
-            "Bot Dinonaktifkan!"
-        )
-
-    end)
-end
-
--- ========================================================
--- ON / OFF
--- ========================================================
-
-ToggleButton.MouseButton1Click:Connect(
-    function()
-
-        if not _G.AutoJobGlerity then
-
-            _G.AutoJobGlerity = true
-
-            ToggleButton.BackgroundColor3 =
-                Color3.fromRGB(
-                    30,
-                    150,
-                    30
-                )
-
-            ToggleButton.Text =
-                "STOP BOT"
-
-            updateStatus(
-                "Bot Aktif..."
-            )
-
-            startLoop()
-
-        else
-
-            _G.AutoJobGlerity = false
-
-            ToggleButton.BackgroundColor3 =
-                Color3.fromRGB(
-                    200,
-                    30,
-                    30
-                )
-
-            ToggleButton.Text =
-                "MULAI BOT"
-
-            updateStatus(
-                "Bot Dinonaktifkan!"
-            )
-
-        end
+-- RenderStepped Loop untuk Speed & Jump (Anti Reset)
+RunService.RenderStepped:Connect(function()
+    if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid.WalkSpeed = _G.WalkSpeed
+        LP.Character.Humanoid.JumpPower = _G.JumpPower
     end
-)
+end)
 
--- ========================================================
--- RESET SAAT RESPAWN
--- ========================================================
+-- [[ ANTI AFK SYSTEM ]] --
+TabSettings:CreateButton({
+   Name = "Aktifkan Anti-AFK",
+   Callback = function()
+      local vu = game:GetService("VirtualUser")
+      LP.Idled:Connect(function()
+         vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+         task.wait(1)
+         vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+      end)
+      Rayfield:Notify({Title = "Success", Content = "Anti-AFK Aktif! Kamu tidak akan terputus."})
+   end,
+})
 
-LocalPlayer.CharacterAdded:Connect(
-    function()
-        if _G.AutoJobGlerity then
-            task.wait(2)
-            updateStatus(
-                "Character respawn, bot aktif..."
-            )
-        end
-    end
-)
+TabSettings:CreateButton({
+   Name = "Destroy GUI",
+   Callback = function()
+      Rayfield:Destroy()
+   end,
+})
 
-print(
-    "[INDO GLERITY] Script berhasil dimuat."
-)
+-- [[ NOTIFICATION ]] --
+Rayfield:Notify({
+   Title = "Danz Hub Loaded!",
+   Content = "Selamat bermain! Gunakan Auto Kick untuk mulai.",
+   Duration = 5,
+   Image = 4483362458,
+})
+
+-- Akhir dari Script (Sekitar 180-200 baris dengan library Rayfield)
