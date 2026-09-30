@@ -1,597 +1,708 @@
---==================================================
---              DANZZY PREMIUM
---==================================================
--- Auto Farm Brewog
--- TP Brewog
--- Get Coordinate
--- Speed 16 / 50 / 500
--- Infinite Jump
--- Hide / Show
---==================================================
+-- ========================================================
+--               INDO GLERITY REBORN PREMIUM
+-- ========================================================
+--  [+] Created By : @beruk
+--  [+] Version    : v1.0.1-Fixed
+--  [+] Features   : Auto Job, Screen GUI Toggle
+-- ========================================================
 
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 
-local Player = Players.LocalPlayer
-local PlayerGui = Player:WaitForChild("PlayerGui")
+local LocalPlayer = Players.LocalPlayer
 
---==================================================
--- SETTINGS
---==================================================
-
-_G.DanzzyAutoFarm = false
-local BrewogTarget = "Brewog"
-
---==================================================
+-- ========================================================
 -- GUI
---==================================================
+-- ========================================================
 
-local Gui = Instance.new("ScreenGui")
-Gui.Name = "DanzzyPremium"
-Gui.ResetOnSpawn = false
-Gui.Parent = PlayerGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "IndoGlerityPremium"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-local Main = Instance.new("Frame")
-Main.Parent = Gui
-Main.Size = UDim2.fromOffset(330,390)
-Main.Position = UDim2.new(0.5,-165,0.5,-195)
-Main.BackgroundColor3 = Color3.fromRGB(17,19,27)
-Main.BorderSizePixel = 0
+local Frame = Instance.new("Frame")
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Frame.Position = UDim2.new(0.02, 0, 0.1, 0)
+Frame.Size = UDim2.new(0, 260, 0, 180)
+Frame.BorderSizePixel = 0
 
-Instance.new("UICorner",Main).CornerRadius = UDim.new(0,12)
+local UICornerFrame = Instance.new("UICorner")
+UICornerFrame.CornerRadius = UDim.new(0, 8)
+UICornerFrame.Parent = Frame
 
-local Stroke = Instance.new("UIStroke")
-Stroke.Parent = Main
-Stroke.Color = Color3.fromRGB(75,80,100)
-Stroke.Thickness = 1.5
-
---==================================================
+-- ========================================================
 -- TITLE
---==================================================
+-- ========================================================
 
-local Title = Instance.new("TextLabel")
-Title.Parent = Main
-Title.Size = UDim2.new(1,-80,0,45)
-Title.Position = UDim2.fromOffset(15,5)
-Title.BackgroundTransparency = 1
-Title.Text = "DANZZY PREMIUM"
-Title.TextColor3 = Color3.new(1,1,1)
-Title.TextSize = 19
-Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Parent = Frame
+TitleLabel.Size = UDim2.new(1, 0, 0, 30)
+TitleLabel.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 14
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.Text = "  INDO GLERITY AUTOMATION"
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.BorderSizePixel = 0
 
-local Close = Instance.new("TextButton")
-Close.Parent = Main
-Close.Size = UDim2.fromOffset(32,30)
-Close.Position = UDim2.new(1,-42,0,10)
-Close.Text = "X"
-Close.TextColor3 = Color3.new(1,1,1)
-Close.TextSize = 13
-Close.Font = Enum.Font.GothamBold
-Close.BackgroundColor3 = Color3.fromRGB(190,45,45)
-Close.BorderSizePixel = 0
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 8)
+TitleCorner.Parent = TitleLabel
 
-Instance.new("UICorner",Close).CornerRadius = UDim.new(0,6)
+-- ========================================================
+-- INFO
+-- ========================================================
 
---==================================================
--- STATUS
---==================================================
+local InfoLabel = Instance.new("TextLabel")
+InfoLabel.Parent = Frame
+InfoLabel.Position = UDim2.new(0, 10, 0, 35)
+InfoLabel.Size = UDim2.new(1, -20, 0, 90)
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+InfoLabel.TextSize = 13
+InfoLabel.Font = Enum.Font.SourceSans
+InfoLabel.TextWrapped = true
+InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
+InfoLabel.TextYAlignment = Enum.TextYAlignment.Top
+InfoLabel.RichText = true
 
-local Status = Instance.new("TextLabel")
-Status.Parent = Main
-Status.Size = UDim2.new(1,-30,0,32)
-Status.Position = UDim2.fromOffset(15,45)
-Status.BackgroundTransparency = 1
-Status.Text = "● DANZZY READY"
-Status.TextColor3 = Color3.fromRGB(80,220,120)
-Status.TextSize = 11
-Status.Font = Enum.Font.GothamBold
-Status.TextXAlignment = Enum.TextXAlignment.Left
-
---==================================================
+-- ========================================================
 -- BUTTON
---==================================================
+-- ========================================================
 
-local function Button(Text, X, Y)
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = Frame
+ToggleButton.Position = UDim2.new(0, 10, 0, 135)
+ToggleButton.Size = UDim2.new(1, -20, 0, 35)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.TextSize = 14
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Text = "MULAI BOT"
+ToggleButton.BorderSizePixel = 0
 
-    local B = Instance.new("TextButton")
-    B.Parent = Main
-    B.Size = UDim2.fromOffset(145,42)
-    B.Position = UDim2.fromOffset(X,Y)
-    B.BackgroundColor3 = Color3.fromRGB(43,47,60)
-    B.BorderSizePixel = 0
-    B.Text = Text
-    B.TextColor3 = Color3.new(1,1,1)
-    B.TextSize = 11
-    B.Font = Enum.Font.GothamBold
-    B.AutoButtonColor = false
+local UICornerButton = Instance.new("UICorner")
+UICornerButton.CornerRadius = UDim.new(0, 6)
+UICornerButton.Parent = ToggleButton
 
-    Instance.new("UICorner",B).CornerRadius = UDim.new(0,7)
+-- ========================================================
+-- STATUS
+-- ========================================================
 
-    return B
+local function updateStatus(statusBaru)
+    InfoLabel.Text = string.format(
+        "<b>Owner:</b> @XyzOwner\n" ..
+        "<b>Version:</b> v1.0.1-Fixed\n" ..
+        "<b>Features:</b> Auto Job\n\n" ..
+        "<b>Status:</b> <font color='#FFA500'>%s</font>",
+        tostring(statusBaru)
+    )
 end
 
---==================================================
--- MAIN BUTTONS
---==================================================
+_G.AutoJobGlerity = false
 
-local AutoFarm = Button("AUTO FARM : OFF",15,85)
-local TPBrewog = Button("TP BREWOG",170,85)
+updateStatus("Bot Siap Digunakan!")
 
-local Speed16 = Button("SPEED : 16",15,135)
-local Speed50 = Button("SPEED : 50",170,135)
+-- ========================================================
+-- HELPER
+-- ========================================================
 
-local Speed500 = Button("SPEED : 500",15,185)
-local Infinite = Button("INFINITE JUMP : OFF",170,185)
-
-local GetCoord = Button("GET COORD",15,235)
-local Fullbright = Button("FULLBRIGHT : OFF",170,235)
-
-local Hide = Button("HIDE MENU",15,285)
-
---==================================================
--- HUMANOID
---==================================================
-
-local function GetCharacter()
-
-    local Character = Player.Character
-
-    if not Character then
-        Character = Player.CharacterAdded:Wait()
-    end
-
-    return Character
+local function getCharacter()
+    return LocalPlayer.Character
+        or LocalPlayer.CharacterAdded:Wait()
 end
 
-local function GetRoot()
-
-    local Character = GetCharacter()
-
-    return Character:FindFirstChild("HumanoidRootPart")
+local function getRoot()
+    local character = getCharacter()
+    return character:FindFirstChild("HumanoidRootPart")
 end
 
-local function GetHumanoid()
-
-    local Character = GetCharacter()
-
-    return Character:FindFirstChildOfClass("Humanoid")
+local function getHumanoid()
+    local character = getCharacter()
+    return character:FindFirstChildOfClass("Humanoid")
 end
 
---==================================================
--- FIND BREWOG
---==================================================
+-- Mengambil posisi dari Part / Model / Decal
+local function getObjectPosition(object)
 
-local function FindBrewog()
-
-    return workspace:FindFirstChild(BrewogTarget,true)
-
-end
-
---==================================================
--- TELEPORT BREWOG
---==================================================
-
-local function TeleportBrewog()
-
-    local Root = GetRoot()
-    local Target = FindBrewog()
-
-    if not Root then
-        Status.Text = "● CHARACTER BELUM SIAP"
-        return
-    end
-
-    if not Target then
-        Status.Text = "● BREWOG TIDAK DITEMUKAN"
-        return
-    end
-
-    local Part
-
-    if Target:IsA("BasePart") then
-
-        Part = Target
-
-    elseif Target:IsA("Model") then
-
-        Part =
-            Target.PrimaryPart
-            or Target:FindFirstChildWhichIsA("BasePart",true)
-
-    end
-
-    if not Part then
-        Status.Text = "● PART BREWOG TIDAK ADA"
-        return
-    end
-
-    Root.CFrame = Part.CFrame + Vector3.new(0,3,0)
-
-    Status.Text = "● TP : BREWOG"
-
-end
-
-TPBrewog.MouseButton1Click:Connect(TeleportBrewog)
-
---==================================================
--- AUTO FARM BREWOG
---==================================================
-
-_G.DanzzyAutoFarm = false
-
-local function GetBrewogPart()
-    local Target = workspace:FindFirstChild("Brewog", true)
-
-    if not Target then
+    if not object then
         return nil
     end
 
-    if Target:IsA("BasePart") then
-        return Target
+    if object:IsA("BasePart") then
+        return object.Position
     end
 
-    if Target:IsA("Model") then
-        return Target.PrimaryPart
-            or Target:FindFirstChildWhichIsA("BasePart", true)
+    if object:IsA("Attachment") then
+        return object.WorldPosition
+    end
+
+    if object:IsA("Decal") then
+
+        local parent = object.Parent
+
+        if parent and parent:IsA("BasePart") then
+            return parent.Position
+        end
+
+    end
+
+    if object:IsA("Model") then
+
+        local primary = object.PrimaryPart
+
+        if primary then
+            return primary.Position
+        end
+
+        local part =
+            object:FindFirstChildWhichIsA(
+                "BasePart",
+                true
+            )
+
+        if part then
+            return part.Position
+        end
     end
 
     return nil
 end
 
-local function StartAutoFarm()
+-- ========================================================
+-- PENGATURAN
+-- ========================================================
+
+local KECEPATAN_TERBANG = 65
+local TINGGI_TERBANG = 25
+
+-- ========================================================
+-- JALAN KE TARGET
+-- ========================================================
+
+local function jalanKeTarget(posisiTarget)
+
+    local humanoid = getHumanoid()
+    local root = getRoot()
+
+    if not humanoid or not root then
+        return false
+    end
+
+    if typeof(posisiTarget) ~= "Vector3" then
+        return false
+    end
+
+    local timeout = 0
+
+    while _G.AutoJobGlerity do
+
+        root = getRoot()
+
+        if not root then
+            return false
+        end
+
+        local jarak =
+            (root.Position - posisiTarget).Magnitude
+
+        if jarak <= 4 then
+            return true
+        end
+
+        humanoid:MoveTo(posisiTarget)
+
+        task.wait(0.15)
+
+        timeout += 0.15
+
+        -- Mencegah loop selamanya
+        if timeout >= 30 then
+            return false
+        end
+    end
+
+    return false
+end
+
+-- ========================================================
+-- CARI MOBIL PLAYER
+-- ========================================================
+
+local function cariMobilPemain()
+
+    local humanoid = getHumanoid()
+
+    if not humanoid then
+        return nil
+    end
+
+    for _, object in ipairs(
+        workspace:GetDescendants()
+    ) do
+
+        if object:IsA("VehicleSeat")
+        and object.Occupant == humanoid then
+
+            return object.Parent
+        end
+    end
+
+    return nil
+end
+
+-- ========================================================
+-- CARI OBJEK BERDASARKAN NAMA / WARNA
+-- ========================================================
+
+local function cariObjekBerdasarkanWarna(namaWarna)
+
+    local root = getRoot()
+
+    if not root then
+        return nil
+    end
+
+    local terdekat = nil
+    local jarakTerdekat = math.huge
+
+    for _, object in ipairs(
+        workspace:GetDescendants()
+    ) do
+
+        local position =
+            getObjectPosition(object)
+
+        if position then
+
+            local nama =
+                string.lower(object.Name)
+
+            local cocok = false
+
+            if namaWarna == "Kuning" then
+
+                if object:IsA("BasePart") then
+
+                    local warna =
+                        object.BrickColor.Name
+
+                    cocok =
+                        warna == "New Yeller"
+                        or warna == "Bright yellow"
+                        or string.find(nama, "yellow")
+                        or string.find(nama, "panah")
+                        or string.find(nama, "delivery")
+                        or string.find(nama, "target")
+
+                else
+
+                    cocok =
+                        string.find(nama, "yellow")
+                        or string.find(nama, "panah")
+                        or string.find(nama, "delivery")
+                        or string.find(nama, "target")
+
+                end
+
+            elseif namaWarna == "Merah" then
+
+                if object:IsA("BasePart") then
+
+                    local warna =
+                        object.BrickColor.Name
+
+                    cocok =
+                        warna == "Bright red"
+                        or nama == "job"
+                        or string.find(nama, "job")
+                        or string.find(nama, "red")
+
+                else
+
+                    cocok =
+                        nama == "job"
+                        or string.find(nama, "job")
+                        or string.find(nama, "red")
+
+                end
+            end
+
+            if cocok then
+
+                local jarak =
+                    (root.Position - position).Magnitude
+
+                if jarak < jarakTerdekat
+                and jarak > 2 then
+
+                    jarakTerdekat = jarak
+                    terdekat = object
+
+                end
+            end
+        end
+    end
+
+    return terdekat
+end
+
+-- ========================================================
+-- CARI SPOT JOB
+-- ========================================================
+
+local function cariSpotJob()
+
+    local job =
+        workspace:FindFirstChild(
+            "job",
+            true
+        )
+
+    if job and getObjectPosition(job) then
+        return job
+    end
+
+    return cariObjekBerdasarkanWarna("Merah")
+end
+
+-- ========================================================
+-- PINDAH KE TARGET
+-- ========================================================
+
+local function terbangKeTarget(targetObject)
+
+    if not targetObject
+    or not _G.AutoJobGlerity then
+        return false
+    end
+
+    local mobil =
+        cariMobilPemain()
+
+    if not mobil then
+        return false
+    end
+
+    local targetPos =
+        getObjectPosition(targetObject)
+
+    if not targetPos then
+        return false
+    end
+
+    local mainPart =
+        mobil:FindFirstChild("DriveSeat")
+        or mobil:FindFirstChild("VehicleSeat")
+        or mobil.PrimaryPart
+        or mobil:FindFirstChildWhichIsA(
+            "BasePart",
+            true
+        )
+
+    if not mainPart then
+        return false
+    end
+
+    -- Naik ke posisi atas
+    local posisiAtas =
+        mainPart.Position
+        + Vector3.new(
+            0,
+            TINGGI_TERBANG,
+            0
+        )
+
+    local naik =
+        TweenService:Create(
+            mainPart,
+            TweenInfo.new(1.2),
+            {
+                CFrame =
+                    CFrame.new(posisiAtas)
+            }
+        )
+
+    naik:Play()
+    naik.Completed:Wait()
+
+    if not _G.AutoJobGlerity then
+        return false
+    end
+
+    -- Bergerak horizontal
+    local jarak =
+        (
+            mainPart.Position
+            - targetPos
+        ).Magnitude
+
+    local durasi =
+        math.max(
+            jarak / KECEPATAN_TERBANG,
+            0.1
+        )
+
+    local targetCFrame =
+        CFrame.new(
+            targetPos.X,
+            posisiAtas.Y,
+            targetPos.Z
+        )
+
+    local perjalanan =
+        TweenService:Create(
+            mainPart,
+            TweenInfo.new(
+                durasi,
+                Enum.EasingStyle.Linear
+            ),
+            {
+                CFrame = targetCFrame
+            }
+        )
+
+    perjalanan:Play()
+    perjalanan.Completed:Wait()
+
+    if not _G.AutoJobGlerity then
+        return false
+    end
+
+    -- Turun ke target
+    local turun =
+        TweenService:Create(
+            mainPart,
+            TweenInfo.new(1.2),
+            {
+                CFrame =
+                    CFrame.new(targetPos)
+            }
+        )
+
+    turun:Play()
+    turun.Completed:Wait()
+
+    return true
+end
+
+-- ========================================================
+-- LOOP UTAMA
+-- ========================================================
+
+local function startLoop()
 
     task.spawn(function()
 
-        while _G.DanzzyAutoFarm do
+        while _G.AutoJobGlerity do
 
-            local Character = Player.Character
+            -- STEP 1
+            updateStatus(
+                "Mencari Spot Job..."
+            )
 
-            if not Character then
-                task.wait(1)
-                continue
-            end
+            local spotJob =
+                cariSpotJob()
 
-            local Root =
-                Character:FindFirstChild("HumanoidRootPart")
+            if not spotJob then
 
-            local Target = GetBrewogPart()
+                updateStatus(
+                    "Spot Job tidak ditemukan..."
+                )
 
-            if not Root then
-                task.wait(1)
-                continue
-            end
-
-            if not Target then
-                Status.Text = "● MENCARI BREWOG..."
                 task.wait(2)
                 continue
             end
 
-            -- menuju titik Brewog
-            Status.Text = "● MENUJU BREWOG..."
+            local posisiJob =
+                getObjectPosition(spotJob)
 
-            Root.CFrame =
-                Target.CFrame + Vector3.new(0,3,0)
+            if not posisiJob then
 
-            task.wait(2)
+                task.wait(1)
+                continue
+            end
 
-            if not _G.DanzzyAutoFarm then
+            -- STEP 2
+            updateStatus(
+                "Jalan ke Spot Job..."
+            )
+
+            local sampai =
+                jalanKeTarget(posisiJob)
+
+            if not sampai then
+
+                task.wait(1)
+                continue
+            end
+
+            if not _G.AutoJobGlerity then
                 break
             end
 
-            -- tetap di area Brewog
-            Status.Text = "● AUTO FARM BREWOG : ON"
+            task.wait(2)
 
-            for i = 1,10 do
+            -- STEP 3
+            updateStatus(
+                "Menunggu Kendaraan..."
+            )
 
-                if not _G.DanzzyAutoFarm then
+            local kendaraan = nil
+            local waktu = 0
+
+            repeat
+
+                kendaraan =
+                    cariMobilPemain()
+
+                task.wait(0.5)
+
+                waktu += 0.5
+
+                if waktu >= 30 then
                     break
                 end
 
-                local CurrentRoot =
-                    Player.Character
-                    and Player.Character:FindFirstChild(
-                        "HumanoidRootPart"
-                    )
+            until kendaraan
+            or not _G.AutoJobGlerity
 
-                if CurrentRoot then
-
-                    local Distance =
-                        (CurrentRoot.Position -
-                        Target.Position).Magnitude
-
-                    -- kalau keluar area, kembali
-                    if Distance > 10 then
-                        CurrentRoot.CFrame =
-                            Target.CFrame +
-                            Vector3.new(0,3,0)
-                    end
-
-                end
-
-                task.wait(1)
-
+            if not _G.AutoJobGlerity then
+                break
             end
 
+            if not kendaraan then
+
+                updateStatus(
+                    "Kendaraan tidak ditemukan."
+                )
+
+                task.wait(2)
+                continue
+            end
+
+            -- STEP 4
+            updateStatus(
+                "Mencari Tujuan..."
+            )
+
+            local target =
+                cariObjekBerdasarkanWarna(
+                    "Kuning"
+                )
+
+            if not target then
+
+                updateStatus(
+                    "Target kuning tidak ditemukan."
+                )
+
+                task.wait(2)
+                continue
+            end
+
+            -- STEP 5
+            updateStatus(
+                "Menuju Target..."
+            )
+
+            terbangKeTarget(target)
+
+            if not _G.AutoJobGlerity then
+                break
+            end
+
+            -- STEP 6
+            updateStatus(
+                "Menunggu Proses Job..."
+            )
+
+            task.wait(5)
+
+            if not _G.AutoJobGlerity then
+                break
+            end
+
+            -- STEP 7
+            updateStatus(
+                "Mencari Target Berikutnya..."
+            )
+
+            task.wait(1)
         end
 
-        Status.Text = "● AUTO FARM : OFF"
+        updateStatus(
+            "Bot Dinonaktifkan!"
+        )
 
     end)
-
 end
 
-AutoFarm.MouseButton1Click:Connect(function()
+-- ========================================================
+-- ON / OFF
+-- ========================================================
 
-    _G.DanzzyAutoFarm =
-        not _G.DanzzyAutoFarm
+ToggleButton.MouseButton1Click:Connect(
+    function()
 
-    if _G.DanzzyAutoFarm then
+        if not _G.AutoJobGlerity then
 
-        AutoFarm.Text = "AUTO FARM : ON"
-        AutoFarm.BackgroundColor3 =
-            Color3.fromRGB(35,150,75)
+            _G.AutoJobGlerity = true
 
-        Status.Text =
-            "● AUTO FARM BREWOG : ON"
+            ToggleButton.BackgroundColor3 =
+                Color3.fromRGB(
+                    30,
+                    150,
+                    30
+                )
 
-        StartAutoFarm()
+            ToggleButton.Text =
+                "STOP BOT"
 
-    else
+            updateStatus(
+                "Bot Aktif..."
+            )
 
-        AutoFarm.Text = "AUTO FARM : OFF"
-        AutoFarm.BackgroundColor3 =
-            Color3.fromRGB(43,47,60)
+            startLoop()
 
-        Status.Text =
-            "● AUTO FARM : OFF"
+        else
 
+            _G.AutoJobGlerity = false
+
+            ToggleButton.BackgroundColor3 =
+                Color3.fromRGB(
+                    200,
+                    30,
+                    30
+                )
+
+            ToggleButton.Text =
+                "MULAI BOT"
+
+            updateStatus(
+                "Bot Dinonaktifkan!"
+            )
+
+        end
     end
+)
 
-end)
+-- ========================================================
+-- RESET SAAT RESPAWN
+-- ========================================================
 
---==================================================
--- SPEED
---==================================================
-
-Speed16.MouseButton1Click:Connect(function()
-
-    local Humanoid = GetHumanoid()
-
-    if Humanoid then
-
-        Humanoid.WalkSpeed = 16
-        Status.Text = "● SPEED : 16"
-
+LocalPlayer.CharacterAdded:Connect(
+    function()
+        if _G.AutoJobGlerity then
+            task.wait(2)
+            updateStatus(
+                "Character respawn, bot aktif..."
+            )
+        end
     end
-
-end)
-
-Speed50.MouseButton1Click:Connect(function()
-
-    local Humanoid = GetHumanoid()
-
-    if Humanoid then
-
-        Humanoid.WalkSpeed = 50
-        Status.Text = "● SPEED : 50"
-
-    end
-
-end)
-
-Speed500.MouseButton1Click:Connect(function()
-
-    local Humanoid = GetHumanoid()
-
-    if Humanoid then
-
-        Humanoid.WalkSpeed = 500
-        Status.Text = "● SPEED : 500"
-
-    end
-
-end)
-
---==================================================
--- INFINITE JUMP
---==================================================
-
-local InfiniteOn = false
-
-Infinite.MouseButton1Click:Connect(function()
-
-    InfiniteOn = not InfiniteOn
-
-    if InfiniteOn then
-
-        Infinite.Text = "INFINITE JUMP : ON"
-        Infinite.BackgroundColor3 =
-            Color3.fromRGB(35,150,75)
-
-    else
-
-        Infinite.Text = "INFINITE JUMP : OFF"
-        Infinite.BackgroundColor3 =
-            Color3.fromRGB(43,47,60)
-
-    end
-
-end)
-
-UIS.JumpRequest:Connect(function()
-
-    if not InfiniteOn then
-        return
-    end
-
-    local Humanoid = GetHumanoid()
-
-    if Humanoid then
-
-        Humanoid:ChangeState(
-            Enum.HumanoidStateType.Jumping
-        )
-
-    end
-
-end)
-
---==================================================
--- GET COORD
---==================================================
-
-GetCoord.MouseButton1Click:Connect(function()
-
-    local Root = GetRoot()
-
-    if not Root then
-        Status.Text = "● ROOT TIDAK DITEMUKAN"
-        return
-    end
-
-    local P = Root.Position
-
-    print("========== DANZZY COORD ==========")
-    print("X =",P.X)
-    print("Y =",P.Y)
-    print("Z =",P.Z)
-    print("==================================")
-
-    Status.Text = string.format(
-        "X %.1f | Y %.1f | Z %.1f",
-        P.X,P.Y,P.Z
-    )
-
-end)
-
---==================================================
--- FULLBRIGHT
---==================================================
-
-local BrightOn = false
-
-Fullbright.MouseButton1Click:Connect(function()
-
-    BrightOn = not BrightOn
-
-    if BrightOn then
-
-        Lighting.Brightness = 3
-        Lighting.ClockTime = 14
-        Lighting.FogEnd = 100000
-
-        Fullbright.Text = "FULLBRIGHT : ON"
-
-    else
-
-        Lighting.Brightness = 1
-        Lighting.FogEnd = 1000
-
-        Fullbright.Text = "FULLBRIGHT : OFF"
-
-    end
-
-end)
-
---==================================================
--- HIDE / SHOW
---==================================================
-
-local Show = Instance.new("TextButton")
-Show.Parent = Gui
-Show.Size = UDim2.fromOffset(55,55)
-Show.Position = UDim2.new(0,20,0.5,-25)
-Show.Text = "D"
-Show.TextSize = 21
-Show.Font = Enum.Font.GothamBold
-Show.TextColor3 = Color3.new(1,1,1)
-Show.BackgroundColor3 = Color3.fromRGB(25,28,38)
-Show.BorderSizePixel = 0
-Show.Visible = false
-
-Instance.new("UICorner",Show).CornerRadius =
-    UDim.new(1,0)
-
-Hide.MouseButton1Click:Connect(function()
-
-    Main.Visible = false
-    Show.Visible = true
-
-end)
-
-Show.MouseButton1Click:Connect(function()
-
-    Main.Visible = true
-    Show.Visible = false
-
-end)
-
---==================================================
--- CLOSE
---==================================================
-
-Close.MouseButton1Click:Connect(function()
-
-    _G.DanzzyAutoFarm = false
-    Gui:Destroy()
-
-end)
-
---==================================================
--- DRAG
---==================================================
-
-local Dragging = false
-local DragStart
-local StartPos
-
-Title.InputBegan:Connect(function(Input)
-
-    if Input.UserInputType == Enum.UserInputType.MouseButton1
-    or Input.UserInputType == Enum.UserInputType.Touch then
-
-        Dragging = true
-        DragStart = Input.Position
-        StartPos = Main.Position
-
-    end
-
-end)
-
-UIS.InputChanged:Connect(function(Input)
-
-    if not Dragging then
-        return
-    end
-
-    if Input.UserInputType == Enum.UserInputType.MouseMovement
-    or Input.UserInputType == Enum.UserInputType.Touch then
-
-        local Delta = Input.Position - DragStart
-
-        Main.Position = UDim2.new(
-            StartPos.X.Scale,
-            StartPos.X.Offset + Delta.X,
-            StartPos.Y.Scale,
-            StartPos.Y.Offset + Delta.Y
-        )
-
-    end
-
-end)
-
-UIS.InputEnded:Connect(function(Input)
-
-    if Input.UserInputType == Enum.UserInputType.MouseButton1
-    or Input.UserInputType == Enum.UserInputType.Touch then
-
-        Dragging = false
-
-    end
-
-end)
-
-print("DANZZY PREMIUM READY")
+)
+
+print(
+    "[INDO GLERITY] Script berhasil dimuat."
+)
