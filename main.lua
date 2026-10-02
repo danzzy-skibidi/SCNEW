@@ -1,199 +1,152 @@
--- [[ Danz HUB EXTREME EDITION V3 ]] --
--- Nama Game: Tendang Blok Keberuntungan (Kick a Lucky Block)
--- Target Executor: Delta Android
+-- DANZZY MENU v1
+-- LocalScript
+-- Truck | Ledakan | Clear | WalkSpeed | Infinite Jump | Volume | Hide
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
-local Window = Rayfield:CreateWindow({
-   Name = "Danz HUB | EXTREME EDITION 2026",
-   LoadingTitle = "Memindai Remote Events Game...",
-   LoadingSubtitle = "by Rendy - Capable Fighter",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "RendyHubData",
-      FileName = "KickLuckyExtreme"
-   }
-})
-
--- [[ DATABASE & VARIABLES ]] --
 local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
-local RS = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local Debris = game:GetService("Debris")
+local TweenService = game:GetService("TweenService")
 
-local _G = {
-    AutoKick = false,
-    AutoOG = false,
-    AutoRebirth = false,
-    AutoCollect = false,
-    WalkSpeed = 16,
-    JumpPower = 50
-}
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- [[ AUTO SCANNER FUNCTION ]] --
--- Fungsi ini mencari 'kunci' rahasia game agar script 100% jalan
-local function FindRemote(possibleNames)
-    for _, v in pairs(RS:GetDescendants()) do
-        if v:IsA("RemoteEvent") or v:IsA("UnreliableRemoteEvent") then
-            for _, name in pairs(possibleNames) do
-                if v.Name:lower():find(name:lower()) then
-                    return v
-                end
-            end
-        end
-    end
-    return nil
-end
+local truckOn = false
+local boomOn = false
+local infiniteJump = false
 
-local KickRemote = FindRemote({"Kick", "Punch", "Hit", "Attack"})
-local OpenRemote = FindRemote({"Open", "Buy", "Hatch", "Unlock", "Lucky"})
-local RebirthRemote = FindRemote({"Rebirth", "Ascend", "Prestige"})
+local objects = Instance.new("Folder")
+objects.Name = "DanzzyObjects"
+objects.Parent = workspace
 
--- [[ TABS ]] --
-local TabMain = Window:CreateTab("Auto Farm", 4483362458)
-local TabPlayer = Window:CreateTab("Character", 4483362458)
-local TabSettings = Window:CreateTab("Settings", 4483362458)
+local gui = Instance.new("ScreenGui")
+gui.Name = "DanzzyMenu"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
 
--- [[ AUTO KICK SECTION ]] --
-TabMain:CreateToggle({
-   Name = "Auto Kick (100% Works)",
-   CurrentValue = false,
-   Flag = "KickToggle",
-   Callback = function(Value)
-      _G.AutoKick = Value
-      task.spawn(function()
-         while _G.AutoKick do
-            if KickRemote then
-                KickRemote:FireServer(1) -- Power level 1
-                KickRemote:FireServer(999) -- Mencoba bypass power
-            end
-            task.wait(0.01) -- Turbo speed
-         end
-      end)
-   end,
-})
+local main = Instance.new("Frame")
+main.Size = UDim2.fromOffset(290, 490)
+main.Position = UDim2.new(.5, -145, .5, -245)
+main.BackgroundColor3 = Color3.fromRGB(20,20,30)
+main.BorderSizePixel = 0
+main.Active = true
+main.Parent = gui
 
--- [[ AUTO OG (OPEN BLOCKS) ]] --
-TabMain:CreateToggle({
-   Name = "Auto Open Blocks (Auto OG)",
-   CurrentValue = false,
-   Flag = "OGToggle",
-   Callback = function(Value)
-      _G.AutoOG = Value
-      task.spawn(function()
-         while _G.AutoOG do
-            if OpenRemote then
-                -- Mencoba berbagai kemungkinan argument agar pasti kebuka
-                OpenRemote:FireServer("Basic", 1)
-                OpenRemote:FireServer(1)
-                OpenRemote:FireServer("LuckyBlock", 1)
-            end
-            task.wait(0.1)
-         end
-      end)
-   end,
-})
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0,14)
+mainCorner.Parent = main
 
--- [[ AUTO COLLECT COINS/ITEMS ]] --
-TabMain:CreateToggle({
-   Name = "Auto Collect Orbs/Coins",
-   CurrentValue = false,
-   Flag = "CollectToggle",
-   Callback = function(Value)
-      _G.AutoCollect = Value
-      task.spawn(function()
-         while _G.AutoCollect do
-            pcall(function()
-                for _, v in pairs(workspace:GetChildren()) do
-                    if v:IsA("BasePart") and (v.Name:find("Coin") or v.Name:find("Orb") or v.Name:find("Gem")) then
-                        v.CFrame = LP.Character.HumanoidRootPart.CFrame
-                    end
-                end
-            end)
-            task.wait(0.5)
-         end
-      end)
-   end,
-})
+-- DRAG
+local dragging = false
+local dragStart
+local startPosition
 
--- [[ AUTO REBIRTH ]] --
-TabMain:CreateToggle({
-   Name = "Auto Rebirth",
-   CurrentValue = false,
-   Flag = "RebirthToggle",
-   Callback = function(Value)
-      _G.AutoRebirth = Value
-      task.spawn(function()
-         while _G.AutoRebirth do
-            if RebirthRemote then
-                RebirthRemote:FireServer()
-            end
-            task.wait(2)
-         end
-      end)
-   end,
-})
-
--- [[ PLAYER SECTION ]] --
-TabPlayer:CreateSlider({
-   Name = "WalkSpeed (Lari)",
-   Range = {16, 900},
-   Increment = 1,
-   Suffix = "Speed",
-   CurrentValue = 16,
-   Flag = "SpeedSlider",
-   Callback = function(Value)
-      _G.WalkSpeed = Value
-   end,
-})
-
-TabPlayer:CreateSlider({
-   Name = "JumpPower (Loncat)",
-   Range = {50, 900},
-   Increment = 1,
-   Suffix = "Power",
-   CurrentValue = 50,
-   Flag = "JumpSlider",
-   Callback = function(Value)
-      _G.JumpPower = Value
-   end,
-})
-
--- RenderStepped Loop untuk Speed & Jump (Anti Reset)
-RunService.RenderStepped:Connect(function()
-    if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = _G.WalkSpeed
-        LP.Character.Humanoid.JumpPower = _G.JumpPower
-    end
+main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPosition = main.Position
+	end
 end)
 
--- [[ ANTI AFK SYSTEM ]] --
-TabSettings:CreateButton({
-   Name = "Aktifkan Anti-AFK",
-   Callback = function()
-      local vu = game:GetService("VirtualUser")
-      LP.Idled:Connect(function()
-         vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-         task.wait(1)
-         vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-      end)
-      Rayfield:Notify({Title = "Success", Content = "Anti-AFK Aktif! Kamu tidak akan terputus."})
-   end,
-})
+main.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
+end)
 
-TabSettings:CreateButton({
-   Name = "Destroy GUI",
-   Callback = function()
-      Rayfield:Destroy()
-   end,
-})
+UIS.InputChanged:Connect(function(input)
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch
+	) then
+		local delta = input.Position - dragStart
 
--- [[ NOTIFICATION ]] --
-Rayfield:Notify({
-   Title = "Danz Hub Loaded!",
-   Content = "Selamat bermain! Gunakan Auto Kick untuk mulai.",
-   Duration = 5,
-   Image = 4483362458,
-})
+		main.Position = UDim2.new(
+			startPosition.X.Scale,
+			startPosition.X.Offset + delta.X,
+			startPosition.Y.Scale,
+			startPosition.Y.Offset + delta.Y
+		)
+	end
+end)
 
--- Akhir dari Script (Sekitar 180-200 baris dengan library Rayfield)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,-20,0,45)
+title.Position = UDim2.fromOffset(10,5)
+title.BackgroundTransparency = 1
+title.Text = "DANZZY MENU"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextSize = 22
+title.Font = Enum.Font.GothamBold
+title.Parent = main
+
+local function makeButton(text,y)
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(1,-30,0,40)
+	b.Position = UDim2.fromOffset(15,y)
+	b.BackgroundColor3 = Color3.fromRGB(45,45,60)
+	b.BorderSizePixel = 0
+	b.Text = text
+	b.TextColor3 = Color3.new(1,1,1)
+	b.TextSize = 14
+	b.Font = Enum.Font.GothamBold
+	b.Parent = main
+
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0,9)
+	c.Parent = b
+
+	return b
+end
+
+-- TRUCK
+local truckButton = makeButton("🚛 TRUCK : OFF",55)
+
+local function spawnTruck()
+	local pos = Vector3.new(
+		math.random(-50,50),
+		50 + math.random(0,20),
+		math.random(-50,50)
+	)
+
+	local model = Instance.new("Model")
+	model.Name = "DanzzyTruck"
+	model.Parent = objects
+
+	local body = Instance.new("Part")
+	body.Size = Vector3.new(8,3,14)
+	body.Position = pos
+	body.Material = Enum.Material.Metal
+	body.Parent = model
+
+	local cabin = Instance.new("Part")
+	cabin.Size = Vector3.new(7,4,5)
+	cabin.Position = pos + Vector3.new(0,3.5,-4)
+	cabin.Material = Enum.Material.Metal
+	cabin.Parent = model
+
+	for _,offset in ipairs({
+		Vector3.new(-4,-2,-4),
+		Vector3.new(4,-2,-4),
+		Vector3.new(-4,-2,4),
+		Vector3.new(4,-2,4)
+	}) do
+		local wheel = Instance.new("Part")
+		wheel.Shape = Enum.PartType.Cylinder
+		wheel.Size = Vector3.new(2,2,2)
+		wheel.Position = pos + offset
+		wheel.Material = Enum.Material.Rubber
+		wheel.Parent = model
+	end
+
+	for _,part in ipairs(model:GetChildren()) do
+		if part:IsA("BasePart") then
+			part.Anchored = false
+			part.AssemblyLinearVelocity = Vector3.new(
+				math.random(-20,20),
+				-20,
+				math.random(-20,20)
+			)
+	
