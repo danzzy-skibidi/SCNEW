@@ -1,152 +1,197 @@
--- DANZZY MENU v1
--- LocalScript
--- Truck | Ledakan | Clear | WalkSpeed | Infinite Jump | Volume | Hide
-
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 local Debris = game:GetService("Debris")
-local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local truckOn = false
-local boomOn = false
+local chaos = false
 local infiniteJump = false
 
-local objects = Instance.new("Folder")
-objects.Name = "DanzzyObjects"
-objects.Parent = workspace
-
 local gui = Instance.new("ScreenGui")
-gui.Name = "DanzzyMenu"
+gui.Name = "DanzzyChaosGUI"
 gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
 local main = Instance.new("Frame")
-main.Size = UDim2.fromOffset(290, 490)
-main.Position = UDim2.new(.5, -145, .5, -245)
-main.BackgroundColor3 = Color3.fromRGB(20,20,30)
+main.Size = UDim2.fromOffset(270, 250)
+main.Position = UDim2.new(0.5, -135, 0.5, -125)
+main.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 main.BorderSizePixel = 0
-main.Active = true
 main.Parent = gui
 
-local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0,14)
-mainCorner.Parent = main
-
--- DRAG
-local dragging = false
-local dragStart
-local startPosition
-
-main.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragStart = input.Position
-		startPosition = main.Position
-	end
-end)
-
-main.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = false
-	end
-end)
-
-UIS.InputChanged:Connect(function(input)
-	if dragging and (
-		input.UserInputType == Enum.UserInputType.MouseMovement
-		or input.UserInputType == Enum.UserInputType.Touch
-	) then
-		local delta = input.Position - dragStart
-
-		main.Position = UDim2.new(
-			startPosition.X.Scale,
-			startPosition.X.Offset + delta.X,
-			startPosition.Y.Scale,
-			startPosition.Y.Offset + delta.Y
-		)
-	end
-end)
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = main
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1,-20,0,45)
-title.Position = UDim2.fromOffset(10,5)
+title.Size = UDim2.new(1, -20, 0, 40)
+title.Position = UDim2.fromOffset(10, 5)
 title.BackgroundTransparency = 1
-title.Text = "DANZZY MENU"
-title.TextColor3 = Color3.new(1,1,1)
-title.TextSize = 22
+title.Text = "DANZZY CHAOS"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 21
 title.Font = Enum.Font.GothamBold
 title.Parent = main
 
-local function makeButton(text,y)
+local function createButton(text, y)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1,-30,0,40)
-	b.Position = UDim2.fromOffset(15,y)
-	b.BackgroundColor3 = Color3.fromRGB(45,45,60)
+	b.Size = UDim2.new(1, -30, 0, 40)
+	b.Position = UDim2.fromOffset(15, y)
+	b.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
 	b.BorderSizePixel = 0
 	b.Text = text
-	b.TextColor3 = Color3.new(1,1,1)
+	b.TextColor3 = Color3.new(1, 1, 1)
 	b.TextSize = 14
 	b.Font = Enum.Font.GothamBold
 	b.Parent = main
 
 	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(0,9)
+	c.CornerRadius = UDim.new(0, 8)
 	c.Parent = b
 
 	return b
 end
 
--- TRUCK
-local truckButton = makeButton("🚛 TRUCK : OFF",55)
+local chaosButton = createButton("CHAOS : OFF", 50)
 
-local function spawnTruck()
-	local pos = Vector3.new(
-		math.random(-50,50),
-		50 + math.random(0,20),
-		math.random(-50,50)
-	)
+local speedBox = Instance.new("TextBox")
+speedBox.Size = UDim2.new(1, -30, 0, 40)
+speedBox.Position = UDim2.fromOffset(15, 100)
+speedBox.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+speedBox.BorderSizePixel = 0
+speedBox.PlaceholderText = "Ketik WalkSpeed, contoh 50"
+speedBox.Text = ""
+speedBox.TextColor3 = Color3.new(1, 1, 1)
+speedBox.PlaceholderColor3 = Color3.fromRGB(170, 170, 170)
+speedBox.TextSize = 14
+speedBox.Font = Enum.Font.Gotham
+speedBox.ClearTextOnFocus = false
+speedBox.Parent = main
 
-	local model = Instance.new("Model")
-	model.Name = "DanzzyTruck"
-	model.Parent = objects
+local speedCorner = Instance.new("UICorner")
+speedCorner.CornerRadius = UDim.new(0, 8)
+speedCorner.Parent = speedBox
 
-	local body = Instance.new("Part")
-	body.Size = Vector3.new(8,3,14)
-	body.Position = pos
-	body.Material = Enum.Material.Metal
-	body.Parent = model
+local speedButton = createButton("SET WALKSPEED", 150)
 
-	local cabin = Instance.new("Part")
-	cabin.Size = Vector3.new(7,4,5)
-	cabin.Position = pos + Vector3.new(0,3.5,-4)
-	cabin.Material = Enum.Material.Metal
-	cabin.Parent = model
+speedButton.MouseButton1Click:Connect(function()
+	local value = tonumber(speedBox.Text)
 
-	for _,offset in ipairs({
-		Vector3.new(-4,-2,-4),
-		Vector3.new(4,-2,-4),
-		Vector3.new(-4,-2,4),
-		Vector3.new(4,-2,4)
-	}) do
-		local wheel = Instance.new("Part")
-		wheel.Shape = Enum.PartType.Cylinder
-		wheel.Size = Vector3.new(2,2,2)
-		wheel.Position = pos + offset
-		wheel.Material = Enum.Material.Rubber
-		wheel.Parent = model
+	if not value then
+		return
 	end
 
-	for _,part in ipairs(model:GetChildren()) do
-		if part:IsA("BasePart") then
-			part.Anchored = false
-			part.AssemblyLinearVelocity = Vector3.new(
-				math.random(-20,20),
-				-20,
-				math.random(-20,20)
-			)
-	
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+	if humanoid then
+		humanoid.WalkSpeed = math.clamp(value, 0, 100)
+	end
+end)
+
+local jumpButton = createButton("INFINITE JUMP : OFF", 200)
+
+jumpButton.MouseButton1Click:Connect(function()
+	infiniteJump = not infiniteJump
+
+	if infiniteJump then
+		jumpButton.Text = "INFINITE JUMP : ON"
+	else
+		jumpButton.Text = "INFINITE JUMP : OFF"
+	end
+end)
+
+UserInputService.JumpRequest:Connect(function()
+	if not infiniteJump then
+		return
+	end
+
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+	if humanoid then
+		humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+	end
+end)
+
+local function getPosition()
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+
+	if root then
+		return root.Position
+	end
+
+	return Vector3.new(0, 10, 0)
+end
+
+local function spawnPart()
+	local part = Instance.new("Part")
+
+	part.Size = Vector3.new(
+		math.random(2, 5),
+		math.random(2, 5),
+		math.random(2, 5)
+	)
+
+	part.Position = getPosition() + Vector3.new(
+		math.random(-20, 20),
+		10,
+		math.random(-20, 20)
+	)
+
+	part.Color = Color3.fromRGB(
+		math.random(0, 255),
+		math.random(0, 255),
+		math.random(0, 255)
+	)
+
+	part.Anchored = false
+	part.CanCollide = true
+	part.Parent = Workspace
+
+	part.AssemblyLinearVelocity = Vector3.new(
+		math.random(-50, 50),
+		math.random(20, 50),
+		math.random(-50, 50)
+	)
+
+	Debris:AddItem(part, 10)
+end
+
+local function spawnExplosion()
+	local explosion = Instance.new("Explosion")
+
+	explosion.Position = getPosition() + Vector3.new(
+		math.random(-20, 20),
+		0,
+		math.random(-20, 20)
+	)
+
+	explosion.BlastRadius = 10
+	explosion.BlastPressure = 0
+	explosion.DestroyJointRadiusPercent = 0
+	explosion.Parent = Workspace
+
+	Debris:AddItem(explosion, 2)
+end
+
+chaosButton.MouseButton1Click:Connect(function()
+	chaos = not chaos
+
+	if chaos then
+		chaosButton.Text = "CHAOS : ON"
+
+		task.spawn(function()
+			while chaos do
+				spawnPart()
+				spawnExplosion()
+				task.wait(0.5)
+			end
+		end)
+	else
+		chaosButton.Text = "CHAOS : OFF"
+	end
+end)
